@@ -1,26 +1,30 @@
 module main
 
 import os
-import znlib
+import stdlib
 
 fn main() {
 	// memory buffer and pointers
-	mut memory	:= []byte
-	mut pointers	:= map[string][]int
+	memory		:= []byte
+	pointers	:= map[string][]int
 
 	// get input file
 	files := os.args
 
+	mut lines := []string
+
 	// read each file
 	for file in files  {
 		if os.file_exists(file) {
-			go read(file, memory, pointers)
+			new_lines := os.read_lines(file, memory, pointers)
+			lines << new_lines
 		}
 	}
+
+	read(lines, memory, variables)
 }
 
-fn read(file string, memory mut []byte, variables mut map[string][]int) {
-	lines := os.read_lines(string)
+fn read(lines []string, memory mut []byte, variables mut map[string][]int) {
 	for line in lines {
 		execute(line, memory, variables)
 	}
