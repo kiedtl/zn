@@ -1,0 +1,13 @@
+"
+" cat(1) in Zn.
+" (c) Kied Llaentenn
+"
+
+" here, we initialize the pointer.
+^&@~0*@_0
+
+" read from user.
+|@_N[>@1,@03]&@~0
+
+" print out input.
+|@_N[.@00>@1]

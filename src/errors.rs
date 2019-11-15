@@ -17,6 +17,13 @@ pub enum ErrorCause {
     UnexpectedTokenError,
 }
 
+impl ErrorCause {
+    fn message(&self) -> &str {
+        // TODO expand
+        "oops"
+    }
+}
+
 impl fmt::Display for ErrorCause {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}", self)
@@ -46,11 +53,11 @@ impl Error {
         // print out error type, file, line, and char, and message.
         print!("{}[31m{}@{}[37m:{}:{}:{}: {}[31merror: {}[0m{}\n",
                esc,
-               Error::reason.to_string(),
+               self.reason.to_string(),
                esc,
-               Error::file, Error::lineno, Error::charno,
+               self.file, self.lineno, self.charno,
                esc, esc,
-               Error::reason.message()
+               self.reason.message()
             );
 
         // print out context
@@ -59,6 +66,6 @@ impl Error {
         //              UnspecifiedConditionError@main.zn:23:88: error: address not specified:
         //                  23 | ...$&~25|[+@18]...
         //                     |          ^        
-        print!("\t{} | ...{}...\n", Error::lineno, Error::context);
+        print!("\t{} | ...{}...\n", self.lineno, self.context);
     }
 }
