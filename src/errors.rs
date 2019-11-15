@@ -3,7 +3,9 @@
 // (c) Kied Llaentenn
 //
 
-#[derive(Debug, Copy, Clone)]
+use std::fmt;
+
+#[derive(Debug, Clone)]
 pub enum ErrorCause {
     BufferOverflowError,        // when buffer size exeeds size 65535
     StackOverflowError,         // when stack size exeeds size 8191
@@ -21,7 +23,7 @@ impl fmt::Display for ErrorCause {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 pub struct Error {
     file:           String,
     lineno:         usize,
@@ -44,11 +46,11 @@ impl Error {
         // print out error type, file, line, and char, and message.
         print!("{}[31m{}@{}[37m:{}:{}:{}: {}[31merror: {}[0m{}\n",
                esc,
-               Error.reason.to_string(),
+               Error::reason.to_string(),
                esc,
-               Error.file, Error.lineno, Error.charno,
+               Error::file, Error::lineno, Error::charno,
                esc, esc,
-               Error.reason.message()
+               Error::reason.message()
             );
 
         // print out context
@@ -57,6 +59,6 @@ impl Error {
         //              UnspecifiedConditionError@main.zn:23:88: error: address not specified:
         //                  23 | ...$&~25|[+@18]...
         //                     |          ^        
-        print!("\t{} | ...{}...\n", Error.lineno, Error.context);
+        print!("\t{} | ...{}...\n", Error::lineno, Error::context);
     }
 }

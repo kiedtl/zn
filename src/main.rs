@@ -1,15 +1,25 @@
-use std::fs;
-use std::collections;
+use std::env;
+use std::fs::File;
+use std::collections::LinkedList;
+use std::io::{ BufRead, BufReader };
 
 mod registers;
 mod errors;
 
 fn main() {
     // memory buffer
-    let mut BUFFER: [u8; 65535] = [u8; 65565];
+    let mut BUFFER: [u8; 65535] = [0; 65565];
 
     // registers
-    let mut REGSTR: registers::Register { r, i, c, h, x, a, d = 0 };
+    let mut REGSTR = registers::Register {
+                        r: 0,
+                        i: 0,
+                        c: 0,
+                        h: 0,
+                        x: 0,
+                        a: 0,
+                        d: 0,
+                    };
 
     // double-ended pointer stack ;)
     let mut DSTACK: collections::LinkedList = LinkedList::new();
