@@ -6,6 +6,7 @@ use std::collections::LinkedList;
 mod lexer;
 mod registers;
 mod errors;
+mod zn;
 
 fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
     // memory buffer
@@ -30,23 +31,31 @@ fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
 
     // process file char by char
     // from stackoverflow :P
-    // https://stackoverflow.com/questions/35385703/read-file-character-by-character-in-rust
     let mut lineno = 0;
     let mut charno = 0;
 
     // get arguments
     let args: Vec<String> = env::args().collect::<Vec<String>>();
-    if args.len() < 2 {
-        println!("usage: zn [file]");
+    if args.len() < 3 {
+        println!("USAGE:\n\tzn [action] [file]");
+        println!("ACTIONS:\n\trun\tExecute script.\n\tstat\tPrint statistics on script.");
+
         process::exit(1);
     }
-    let file = &args[1];
+    let file = &args[2];
 
     // file
     let contents = fs::read_to_string(file)?;
-    for command in lexer::lex(contents) {
-        println!("token: {}", command);
+    let commands = lexer::lex(contents);
+    if &args[1] == "run" {
+        zn::execute(commands);
+    } else if &args[1] == "stat" {
+        println!("{}: {} commands", file, commands.len());
+    } else {
+        println!("ERROR: {} is not a valid action.", &args[1]);
     }
 
     Ok(())
 }
+
+
