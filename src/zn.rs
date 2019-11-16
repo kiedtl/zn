@@ -1,5 +1,5 @@
 use std::collections::LinkedList;
-use crate::registers::*;
+use crate::types::*;
 use std::process;
 use crate::errors::*;
 use crate::parser::*;
@@ -31,6 +31,9 @@ pub fn execute(
     }
 }
 
+// setval operation: equivalent to `#` command
+// sets the value of (only) an address or register,
+// from an existing address, register, value, or stack item.
 fn setval(
     BUFFER: &mut [Option<u8>],
     REGSTR: &mut Registers,
@@ -40,14 +43,40 @@ fn setval(
     command_num: usize,
     commands: Vec<String>,
 ) {
-    let src = command.arguments[1];
-    let dest = command.arguments[2];
-    match src.token_type {
-        TokenType::Address => if src.token.parse::<usize>().unwrap()>=BUFFER.len() {
-            die(ErrorCause::BufferOverflowError, file, commands, command_num)
-        } else {
+    // destination for new value
+    let dest = command.arguments[1];
+    // src of new value
+    let src = command.arguments[2];
 
-        TokenType::Register => ,
+    // check if destination is valid, and if so, perform setval operation
+    match dest.token_type {
+        TokenType::Address =>  if !Address::is_valid(dest, BUFFER) {
+            die(ErrorCause::InvalidTokenError, file, commands, command_num);
+        } else {
+            BUFFER[dest.token] = getval(BUFFER, REGSTR, DSTACK, src,
+                                       file, commands, command_num);
+        },
+        TokenType::Register => if !Registers::is_valid(dest) {
+            die(ErrorCause::InvalidRegistorError, file, commands, command_num);
+        } else {
+            match dest.token {
+                "r" => REGSTR.R = getval(BUFFER, REGSTR, DSTACK, src, 
+                                         file, commands, command_num),
+                "c" => REGSTR.C = getval(BUFFER, REGSTR, DSTACK, src,
+                                         file, commands, command_num),
+                "i" => REGSTR.I = getval(BUFFER, REGSTR, DSTACK, src,
+                                         file, commands, command_num),
+                "h" => REGSTR.H = getval(BUFFER, REGSTR, DSTACK, src,
+                                         file, commands, command_num),
+                "x" => REGSTR.X = getval(BUFFER, REGSTR, DSTACK, src,
+                                         file, commands, command_num),
+                "a" => REGSTR.A = getval(BUFFER, REGSTR, DSTACK, src,
+                                         file, commands, command_num),
+                "d" => REGSTR.D = getval(BUFFER, REGSTR, DSTACK, src,
+                                         file, commands, command_num),
+                _ => (),
+            }
+        },
         _ => (),
     }
 }
@@ -62,15 +91,42 @@ fn getval(
     commands: Vec<String>,
     command: usize,
 ) -> u8 {
+    let parsed_token;
     // check for invalid tokens first
-    let parsed_tokenres = token.token.parse::<usize>();
-    match parsed_tokenres {
+    match token.token_type {
+        TokenType::Address => if !Address::is_valid(token, BUFFER) {
+            die(ErrorCause::InvalidTokenError, file, commands, command);
+        } else { parsed_token = token.token.parse::<usize>().unwrap(); }
+        TokenType::Register => if !Register::is_valid(token) {
+            die(ErrorCause::InvalidRegisterError, file, commands, command);
+        } else { parsed_token = token.token.parse::<usize>().unwrap(); }
+        TokenType::RawValue => if !RawValue::is_valid(token) {
+            die(ErrorCause::InvalidTokenError, file, commands, command);
+        } else { parsed_token = token.token.parse::<usize>().unwrap(); }
+        _ => (),
+    }
 
     match token.token_type {
-        TokenType::Address => if token.token.parse::<usize>()>=BUFFER.len() {
-            die(ErrorCause::BufferOverflowError, file, commands, command)
-        } else {
-            BUFFER[token.token]
+        TokenType::Address => BUFFER[parsed_token],
+        TokenType::Register => match token.token {
+            "r" => REGSTR.R,
+            "c" => REGSTR.C,
+            "i" => REGSTR.I,
+            "h" => REGSTR.H,
+            "x" => REGSTR.X,
+            "a" => REGSTR.A,
+            "d" => REGSTR.D,
+        },
+        TokenType::StackTop => *DSTACK.front(),
+        TokenType::StackBottom => *DSTACK.back(),
+        TokenType::RawValue => parsed_token,
+    }
+    0
+}
+
+//
+// helper functions
+//
 
 fn die(
     reason: ErrorCause,

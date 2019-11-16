@@ -7,7 +7,7 @@ use std::fmt;
 
 #[derive(Debug, Clone)]
 pub enum ErrorCause {
-    BufferOverflowError,        // when buffer size exeeds size 65535
+    // BufferOverflowError,        // when buffer size exeeds size 65535
     StackOverflowError,         // when stack size exeeds size 8191
     NilStackPopError,           // when you attempt to pop item off null stack
     InvalidRegisterError,       // when provided token is not a valid register

@@ -1,23 +1,5 @@
 use std::vec::Vec;
-
-pub enum TokenType {
-    Address,
-    Register,
-    StackTop,
-    StackBottom,
-    RawValue,
-}
-
-pub struct Token {
-    pub token:      String,
-    pub token_type: TokenType,
-}
-
-pub struct Command {
-    pub command:    &'static str,
-    pub arguments:  Vec<Token>,
-    pub trailer:    &'static str, // any random chars that hang out at the end of a command. e.g. ] or )
-}
+use crate::types::*;
 
 // match token type
 fn match_token(_char: char) -> TokenType {
