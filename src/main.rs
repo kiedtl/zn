@@ -3,6 +3,7 @@ use std::env;
 use std::process;
 use std::collections::LinkedList;
 
+mod parser;
 mod lexer;
 mod registers;
 mod errors;
@@ -15,7 +16,7 @@ fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
 
     // registers
     #[allow(non_snake_case)]
-    let mut REGSTR = registers::Registers {
+    let REGSTR = registers::Registers {
                         r: 0,
                         i: 0,
                         c: 0,
@@ -27,12 +28,7 @@ fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
 
     // double-ended pointer stack ;)
     #[allow(non_snake_case)]
-    let mut DSTACK: LinkedList<usize> = LinkedList::new();
-
-    // process file char by char
-    // from stackoverflow :P
-    let mut lineno = 0;
-    let mut charno = 0;
+    let DSTACK: LinkedList<usize> = LinkedList::new();
 
     // get arguments
     let args: Vec<String> = env::args().collect::<Vec<String>>();
@@ -48,7 +44,11 @@ fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
     let contents = fs::read_to_string(file)?;
     let commands = lexer::lex(contents);
     if &args[1] == "run" {
-        zn::execute(commands);
+        zn::execute(&mut BUFFER,
+                    &mut REGSTR,
+                    &mut DSTACK,
+                    file.to_string(),
+                    commands);
     } else if &args[1] == "stat" {
         println!("{}: {} commands", file, commands.len());
     } else {

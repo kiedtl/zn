@@ -38,6 +38,7 @@ pub fn lex(contents: String) -> Vec<String> {
 fn is_command(c: char) -> bool {
     match c {
         '$'|
+            '£'|
             '#'|
             '^'|
             '*'|
