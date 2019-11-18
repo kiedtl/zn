@@ -51,29 +51,29 @@ fn setval(
 
     // check if destination is valid, and if so, perform setval operation
     match dest.token_type {
-        TokenType::Address =>  if !Address::is_valid(dest, BUFFER) {
+        TokenType::Address =>  if !Address::is_valid(*dest, BUFFER) {
             die(ErrorCause::InvalidTokenError, file, commands, command_num);
         } else {
-            BUFFER[dest.token.parse::<usize>().unwrap()] = getval(BUFFER, REGSTR, DSTACK, src,
+            BUFFER[dest.token.parse::<usize>().unwrap()] = getval(BUFFER, REGSTR, DSTACK, *src,
                                        file, commands, command_num);
         },
-        TokenType::Register => if !Registers::is_valid(dest) {
+        TokenType::Register => if !Registers::is_valid(*dest) {
             die(ErrorCause::InvalidRegisterError, file, commands, command_num);
         } else {
             match dest.token.as_ref() {
-                "r" => REGSTR.R = getval(BUFFER, REGSTR, DSTACK, src, 
+                "r" => REGSTR.R = getval(BUFFER, REGSTR, DSTACK, *src, 
                                          file, commands, command_num),
-                "c" => REGSTR.C = getval(BUFFER, REGSTR, DSTACK, src,
+                "c" => REGSTR.C = getval(BUFFER, REGSTR, DSTACK, *src,
                                          file, commands, command_num),
-                "i" => REGSTR.I = getval(BUFFER, REGSTR, DSTACK, src,
+                "i" => REGSTR.I = getval(BUFFER, REGSTR, DSTACK, *src,
                                          file, commands, command_num),
-                "h" => REGSTR.H = getval(BUFFER, REGSTR, DSTACK, src,
+                "h" => REGSTR.H = getval(BUFFER, REGSTR, DSTACK, *src,
                                          file, commands, command_num),
-                "x" => REGSTR.X = getval(BUFFER, REGSTR, DSTACK, src,
+                "x" => REGSTR.X = getval(BUFFER, REGSTR, DSTACK, *src,
                                          file, commands, command_num),
-                "a" => REGSTR.A = getval(BUFFER, REGSTR, DSTACK, src,
+                "a" => REGSTR.A = getval(BUFFER, REGSTR, DSTACK, *src,
                                          file, commands, command_num),
-                "d" => REGSTR.D = getval(BUFFER, REGSTR, DSTACK, src,
+                "d" => REGSTR.D = getval(BUFFER, REGSTR, DSTACK, *src,
                                          file, commands, command_num),
                 _ => (),
             }
