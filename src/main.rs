@@ -5,7 +5,7 @@ use std::collections::LinkedList;
 
 mod parser;
 mod lexer;
-mod registers;
+mod types;
 mod errors;
 mod zn;
 
@@ -16,19 +16,19 @@ fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
 
     // registers
     #[allow(non_snake_case)]
-    let REGSTR = registers::Registers {
-                        r: 0,
-                        i: 0,
-                        c: 0,
-                        h: 0,
-                        x: 0,
-                        a: 0,
-                        d: 0,
+    let mut REGSTR = types::Registers {
+                        R: Some(0),
+                        I: Some(0),
+                        C: Some(0),
+                        H: Some(0),
+                        X: Some(0),
+                        A: Some(0),
+                        D: Some(0),
                     };
 
     // double-ended pointer stack ;)
     #[allow(non_snake_case)]
-    let DSTACK: LinkedList<usize> = LinkedList::new();
+    let mut DSTACK: LinkedList<usize> = LinkedList::new();
 
     // get arguments
     let args: Vec<String> = env::args().collect::<Vec<String>>();

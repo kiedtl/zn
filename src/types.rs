@@ -1,9 +1,11 @@
+#[derive(PartialEq)]
 pub enum TokenType {
     Address,
     Register,
     StackTop,
     StackBottom,
     RawValue,
+    Unknown,
 }
 
 pub struct Token {
@@ -11,26 +13,32 @@ pub struct Token {
     pub token_type: TokenType,
 }
 
-pub struct Command {
-    pub command:    &'static str,
+pub struct Command<'a> {
+    pub command:    &'a str,
     pub arguments:  Vec<Token>,
-    pub trailer     &'static str,   // random chars that attach themselved to end of command. e.g. [, ], (, or )
+    pub trailer:    &'a str,   // random chars that attach themselved to end of command. e.g. [, ], (, or )
 }
 
 pub struct Registers {
-    pub R: u8,
-    pub C: u8,
-    pub I: u8,
-    pub H: u8,
-    pub X: u8,
-    pub A: u8,
-    pub D: u8,
+    pub R: Option<u8>,
+    pub C: Option<u8>,
+    pub I: Option<u8>,
+    pub H: Option<u8>,
+    pub X: Option<u8>,
+    pub A: Option<u8>,
+    pub D: Option<u8>,
 }
 
 impl Registers {
     pub fn is_valid(token: Token) -> bool {
-        match token.token {
-            "r"|"c"|"i"|"h"|"x"|"a"|"d" => true,
+        match token.token.as_ref() {
+            "r"
+                |"c"
+                |"i"
+                |"h"
+                |"x"
+                |"a"
+                |"d" => true,
             _ => false,
         }
     }
@@ -41,10 +49,10 @@ pub struct Address {
 }
 
 impl Address {
-    pub fn is_valid(token: Token, BUFFER: [Option<u8>]) -> bool {
-        let ret;
+    pub fn is_valid(token: Token, BUFFER: &[Option<u8>; 65535]) -> bool {
+        let mut ret;
         // if it's not an address in the first place...
-        if !token.token_type == TokenType::Address {
+        if token.token_type != TokenType::Address {
             ret = false;
         }
 
@@ -69,8 +77,8 @@ pub struct RawValue {
 
 impl RawValue {
     pub fn is_valid(token: Token) -> bool {
-        if !token.token_type == TokenType::RawValue {
-            false
+        if token.token_type != TokenType::RawValue {
+            return false;
         }
         
         let result = token.token.parse::<usize>();

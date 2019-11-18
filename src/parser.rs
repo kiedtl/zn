@@ -9,20 +9,24 @@ fn match_token(_char: char) -> TokenType {
         '@' => TokenType::StackTop,
         '!' => TokenType::StackBottom,
         '_' => TokenType::RawValue,
+        _ => TokenType::Unknown,
     }
 }
 
 // parse individual commands
-pub fn parse(command: String) -> Command {
+pub fn parse(command: String) -> Command<'static> {
     let chars = command.chars().collect::<Vec<char>>();
-    let arguments = Vec::<Token>::new();
-    let trailer: &str = if chars[chars.len()-1] == ']' ||
-        chars[chars.len()-1] == ')' 
-        {
-            &chars[chars.len()-1].to_string()
-        } else {
-            ""
-        };
+    let command: &'static str = &*chars[0].to_string();
+    let mut arguments = Vec::<Token>::new();
+    let mut trailer: &'static str = "";
+
+    // TODO [,],(,), all must be own tokens!
+    // TODO this is a placeholder while loops/functions
+    // are not implemented yet.
+    if chars[chars.len()-1] == ']' || chars[chars.len()-1] == ')' {
+            trailer = &*chars[chars.len()-1].to_string();
+    }
+
     let mut ctr = 1;
     for _ in 1..chars.len() {
         let mut c_char = chars[ctr];
@@ -45,7 +49,7 @@ pub fn parse(command: String) -> Command {
         ctr = ctr + 1;
     }
     Command {
-        command: &chars[0].to_string(),
+        command: command,
         arguments: arguments,
         trailer: trailer,
     }
