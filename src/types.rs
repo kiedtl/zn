@@ -1,4 +1,4 @@
-#[derive(PartialEq)]
+#[derive(PartialEq, Copy, Clone)]
 pub enum TokenType {
     Address,
     Register,
@@ -8,15 +8,16 @@ pub enum TokenType {
     Unknown,
 }
 
+#[derive(PartialEq, Clone)]
 pub struct Token {
     pub token:      String,
     pub token_type: TokenType,
 }
 
-pub struct Command<'a> {
-    pub command:    &'a str,
+pub struct Command {
+    pub command:    String,
     pub arguments:  Vec<Token>,
-    pub trailer:    &'a str,   // random chars that attach themselved to end of command. e.g. [, ], (, or )
+    pub trailer:    String,   // random chars that attach themselved to end of command. e.g. [, ], (, or )
 }
 
 pub struct Registers {
@@ -30,7 +31,7 @@ pub struct Registers {
 }
 
 impl Registers {
-    pub fn is_valid(token: Token) -> bool {
+    pub fn is_valid(token: &Token) -> bool {
         match token.token.as_ref() {
             "r"
                 |"c"
@@ -49,11 +50,11 @@ pub struct Address {
 }
 
 impl Address {
-    pub fn is_valid(token: Token, BUFFER: &[Option<u8>; 65535]) -> bool {
+    pub fn is_valid(token: &Token, BUFFER: &[Option<u8>; 65535]) -> bool {
         let mut ret;
         // if it's not an address in the first place...
         if token.token_type != TokenType::Address {
-            ret = false;
+            return false;
         }
 
         let result = token.token.parse::<usize>();
@@ -71,6 +72,10 @@ impl Address {
     }
 }
 
+// TODO: currently, support is only available for
+// type `u8` as raw value; raw_value *should* support
+// `Option<u8>` value.
+// TODO: support Option<u8>; i.e. support None (as `_N`)
 pub struct RawValue {
     pub value: usize,
 }

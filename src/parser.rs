@@ -14,17 +14,18 @@ fn match_token(_char: char) -> TokenType {
 }
 
 // parse individual commands
-pub fn parse(command: String) -> Command<'static> {
+pub fn parse(command: String) -> Command {
     let chars = command.chars().collect::<Vec<char>>();
-    let command: &'static str = &*chars[0].to_string();
+    let command: String = chars[0].to_string();
     let mut arguments = Vec::<Token>::new();
-    let mut trailer: &'static str = "";
+    let mut trailer: String = "".to_string();
 
     // TODO [,],(,), all must be own tokens!
     // TODO this is a placeholder while loops/functions
     // are not implemented yet.
-    if chars[chars.len()-1] == ']' || chars[chars.len()-1] == ')' {
-            trailer = &*chars[chars.len()-1].to_string();
+    match chars[chars.len()-1] {
+            '['|']'|'('|')' => trailer = chars[chars.len()-1].to_string(),
+            _ => (),
     }
 
     let mut ctr = 1;
@@ -51,7 +52,7 @@ pub fn parse(command: String) -> Command<'static> {
     Command {
         command: command,
         arguments: arguments,
-        trailer: trailer,
+        trailer: trailer, 
     }
 }
 
